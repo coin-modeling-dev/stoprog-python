@@ -1,0 +1,60 @@
+{
+  "Module": {
+    "Name": "NewsVendor",
+    "Author": "Alan King",
+    "Date": "1 March 2019",
+    "comment": "Vendor purchases N papers of type I at cost C with budget B, sells D papers at price P.  Receives revenue R. "
+  },
+  "index": {
+    "I": {
+      "ordered": false
+    }
+  },
+  "param": {
+    "B": {
+      "type": "double",
+      "lowerBound": 0.0,
+      "upperBound": "infinity"
+    },
+    "C": {
+      "type": "double",
+      "lowerBound": 0.0,
+      "upperBound": "infinity"
+    },
+    "P": {
+      "type": "double",
+      "lowerBound": 0.0,
+      "upperBound": "infinity"
+    },
+    "D": {
+      "type": "double",
+      "lowerBound": 0.0,
+      "upperBound": "infinity"
+    }
+  },
+  "var": {
+    "N": {
+      "type": "integer",
+      "lowerBound": 0.0,
+      "upperBound": "infinity"
+    }
+  },
+  "expression": {
+    "budget": {
+      "type": "double",
+      "lowerBound": "0.0",
+      "upperBound": "infinity",
+      "value": "B - numpy.inner(N,C)"
+    },
+    "revenue": {
+      "type": "double",
+      "lowerBound": "minus_infinity",
+      "upperBound": "infinity",
+      "value": "numpy.inner(P,D) - numpy.inner(N,C)"
+    },
+    "optimize": {
+      "expression": "revenue",
+      "sense": "maximize"
+    }
+  }
+}
