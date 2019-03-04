@@ -1,60 +1,83 @@
 {
   "Module": {
     "Name": "NewsVendor",
+    "Type": "stochastic",
     "Author": "Alan King",
-    "Date": "1 March 2019",
-    "comment": "Vendor purchases N papers of type I at cost C with budget B, sells D papers at price P.  Receives revenue R. "
+    "Date": "1 March 2019"
   },
-  "index": {
-    "I": {
-      "ordered": false
+  "Stages": [
+    "before_demand",
+    "after_demand"
+  ],
+  "Index": {
+    "newspaper": {
+      "Ordered": false
     }
   },
-  "param": {
-    "B": {
-      "type": "double",
-      "lowerBound": 0.0,
-      "upperBound": "infinity"
-    },
-    "C": {
-      "type": "double",
-      "lowerBound": 0.0,
-      "upperBound": "infinity"
-    },
-    "P": {
-      "type": "double",
-      "lowerBound": 0.0,
-      "upperBound": "infinity"
-    },
-    "D": {
-      "type": "double",
-      "lowerBound": 0.0,
-      "upperBound": "infinity"
-    }
-  },
-  "var": {
-    "N": {
-      "type": "integer",
-      "lowerBound": 0.0,
-      "upperBound": "infinity"
-    }
-  },
-  "expression": {
+  "Param": {
     "budget": {
-      "type": "double",
-      "lowerBound": "0.0",
-      "upperBound": "infinity",
-      "value": "B - numpy.inner(N,C)"
+      "Type": "Double",
+      "Sense": "geq",
+      "Stage": "before_demand"
+    },
+    "cost": {
+      "Type": "Double",
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Stage": "before_demand"
+    },
+    "price": {
+      "Type": "Double",
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Stage": "after_demand"
+    },
+    "demand": {
+      "Type": "Double",
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Stage": "after_demand"
+    }
+  },
+  "Var": {
+    "order": {
+      "Type": "Integer",
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Stage": "before_demand"
+    },
+    "sold": {
+      "Type": "Integer",
+      "Sense": "geq",
+      "Stage": "after_demand"
+    }
+  },
+  "Expression": {
+    "budget": {
+      "Sense": "geq",
+      "Value": "Param.budget - Var.order * Param.cost",
+      "Stage": "before_demand"
+    },
+    "sold_less_than_ordered": {
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Value": "Var.order - Var.sold",
+      "Stage": "after_demand"
+    },
+    "sold_less_than_demanded": {
+      "Index": "newspaper",
+      "Sense": "geq",
+      "Value": "Param.demand - Var.sold",
+      "Stage": "after_demand"
     },
     "revenue": {
-      "type": "double",
-      "lowerBound": "minus_infinity",
-      "upperBound": "infinity",
-      "value": "numpy.inner(P,D) - numpy.inner(N,C)"
-    },
-    "optimize": {
-      "expression": "revenue",
-      "sense": "maximize"
+      "Sense": "free",
+      "Value": "Param.price * Var.sold - Param.cost * Var.ordered",
+      "Stage": "after_demand"
     }
+  },
+  "Optimize": {
+    "Value": "Expression.revenue",
+    "Sense": "maximize"
   }
 }
